@@ -1,14 +1,31 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import Navbar from "./components/Navbar";
+import PageLoader from "./components/PageLoader";
+
 import Dashboard from "./pages/Dashboard";
 import Equipment from "./pages/Equipment";
 import Requests from "./pages/Requests";
 import AdminPanel from "./pages/AdminPanel";
 import Login from "./pages/Login";
+
 import "./App.css";
 
 function ProtectedLayout({ children }) {
   const user = localStorage.getItem("elpUser");
+  const location = useLocation();
+  const [isPageLoading, setIsPageLoading] = useState(false);
+
+  useEffect(() => {
+    setIsPageLoading(true);
+
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -17,7 +34,7 @@ function ProtectedLayout({ children }) {
   return (
     <>
       <Navbar />
-      {children}
+      {isPageLoading ? <PageLoader /> : children}
     </>
   );
 }
