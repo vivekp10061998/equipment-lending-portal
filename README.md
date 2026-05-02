@@ -1,3 +1,2 @@
-# Equipment Lending Portal 
- 
-Full-stack web application using React frontend and Java Spring Boot backend. 
+# equipment-lending-portal
+A full-stack Equipment Lending Portal built with React and Java Spring Boot.
