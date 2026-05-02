@@ -9,11 +9,14 @@ import Equipment from "./pages/Equipment";
 import Requests from "./pages/Requests";
 import AdminPanel from "./pages/AdminPanel";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+
+import { getCurrentUser } from "./services/storageService";
 
 import "./App.css";
 
-function ProtectedLayout({ children }) {
-  const user = localStorage.getItem("elpUser");
+function ProtectedLayout({ children, adminOnly = false }) {
+  const user = getCurrentUser();
   const location = useLocation();
   const [isPageLoading, setIsPageLoading] = useState(false);
 
@@ -31,6 +34,10 @@ function ProtectedLayout({ children }) {
     return <Navigate to="/login" replace />;
   }
 
+  if (adminOnly && user.role !== "ADMIN") {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <>
       <Navbar />
@@ -43,6 +50,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route
         path="/"
@@ -74,7 +82,7 @@ function App() {
       <Route
         path="/admin"
         element={
-          <ProtectedLayout>
+          <ProtectedLayout adminOnly>
             <AdminPanel />
           </ProtectedLayout>
         }

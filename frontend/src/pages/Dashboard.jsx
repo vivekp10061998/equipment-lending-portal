@@ -1,21 +1,47 @@
+import { useEffect, useState } from "react";
 import { Boxes, Clock, CheckCircle2, RotateCcw } from "lucide-react";
 import StatCard from "../components/StatCard";
-import { equipmentList, requestList } from "../data/mockData";
+import {
+  getCurrentUser,
+  getEquipment,
+  getRequests
+} from "../services/storageService";
 
 function Dashboard() {
-  const totalEquipment = equipmentList.length;
-  const availableItems = equipmentList.filter((item) => item.available > 0).length;
-  const pendingRequests = requestList.filter((req) => req.status === "Pending").length;
-  const returnedItems = requestList.filter((req) => req.status === "Returned").length;
+  const [equipment, setEquipment] = useState([]);
+  const [requests, setRequests] = useState([]);
+
+  const user = getCurrentUser();
+
+  useEffect(() => {
+    setEquipment(getEquipment());
+
+    const allRequests = getRequests();
+
+    if (user.role === "ADMIN") {
+      setRequests(allRequests);
+    } else {
+      setRequests(allRequests.filter((request) => request.userId === user.id));
+    }
+  }, [user.id, user.role]);
+
+  const totalEquipment = equipment.length;
+  const availableItems = equipment.filter((item) => item.available > 0).length;
+  const pendingRequests = requests.filter((req) => req.status === "Pending").length;
+  const returnedItems = requests.filter((req) => req.status === "Returned").length;
 
   return (
     <main className="page">
       <section className="heroSection">
         <div>
           <p className="eyebrow">School Equipment Lending Portal</p>
-          <h1>Manage equipment borrowing without messy registers.</h1>
+          <h1>
+            {user.role === "ADMIN"
+              ? "Manage borrowing, approvals, and equipment inventory."
+              : "Request school equipment and track your borrowing status."}
+          </h1>
           <p>
-            Track availability, borrowing requests, approvals, and returns from one clean dashboard.
+            Logged in as {user.name} with {user.role} access.
           </p>
         </div>
       </section>
@@ -31,7 +57,7 @@ function Dashboard() {
         <div className="sectionHeader">
           <div>
             <p className="eyebrow">Recent Activity</p>
-            <h2>Latest Borrowing Requests</h2>
+            <h2>{user.role === "ADMIN" ? "Latest Borrowing Requests" : "My Requests"}</h2>
           </div>
         </div>
 
@@ -46,8 +72,9 @@ function Dashboard() {
                 <th>Status</th>
               </tr>
             </thead>
+
             <tbody>
-              {requestList.map((request) => (
+              {requests.map((request) => (
                 <tr key={request.id}>
                   <td>{request.equipmentName}</td>
                   <td>{request.requestedBy}</td>
@@ -60,6 +87,12 @@ function Dashboard() {
                   </td>
                 </tr>
               ))}
+
+              {requests.length === 0 && (
+                <tr>
+                  <td colSpan="5">No requests found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

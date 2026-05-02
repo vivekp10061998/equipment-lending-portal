@@ -1,12 +1,13 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, LogOut, ShieldCheck } from "lucide-react";
+import { getCurrentUser, logoutUser } from "../services/storageService";
 
 function Navbar() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("elpUser") || "null");
+  const user = getCurrentUser();
 
   const logout = () => {
-    localStorage.removeItem("elpUser");
+    logoutUser();
     navigate("/login");
   };
 
@@ -32,9 +33,11 @@ function Navbar() {
             {user.name} · {user.role}
           </span>
         )}
+
         <button className="iconButton mobileOnly">
           <Menu size={20} />
         </button>
+
         {user && (
           <button className="logoutBtn" onClick={logout}>
             <LogOut size={16} />

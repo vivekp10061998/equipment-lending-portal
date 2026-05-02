@@ -1,6 +1,6 @@
 import { PackageCheck, Send } from "lucide-react";
 
-function EquipmentCard({ item }) {
+function EquipmentCard({ item, onRequest }) {
   const available = item.available > 0;
 
   return (
@@ -27,7 +27,7 @@ function EquipmentCard({ item }) {
           <strong>{item.available}</strong>
         </div>
 
-        <button className="primaryBtn" disabled={!available}>
+        <button className="primaryBtn" disabled={!available} onClick={() => onRequest(item.id)}>
           {available ? <Send size={16} /> : <PackageCheck size={16} />}
           {available ? "Request Item" : "Not Available"}
         </button>
